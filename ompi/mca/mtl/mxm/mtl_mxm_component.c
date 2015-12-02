@@ -23,6 +23,7 @@
 #include "mtl_mxm_types.h"
 #include "mtl_mxm_request.h"
 
+#include <stdbool.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -148,6 +149,7 @@ static int ompi_mtl_mxm_component_open(void)
     mxm_error_t err;
     unsigned long cur_ver;
     int rc;
+    bool test;
 
     mca_mtl_mxm_output = opal_output_open(NULL);
     opal_output_set_verbosity(mca_mtl_mxm_output, ompi_mtl_mxm.verbose);
@@ -178,13 +180,14 @@ static int ompi_mtl_mxm_component_open(void)
 #endif
 
 #if MXM_API >= MXM_VERSION(2,1)
-    if (MXM_OK != mxm_config_read_opts(&ompi_mtl_mxm.mxm_ctx_opts,
+    test = MXM_OK != mxm_config_read_opts(&ompi_mtl_mxm.mxm_ctx_opts,
                                        &ompi_mtl_mxm.mxm_ep_opts,
-                                       "MPI", NULL, 0))
+                                       "MPI", NULL, 0);
 #else
-    if ((MXM_OK != mxm_config_read_context_opts(&ompi_mtl_mxm.mxm_ctx_opts)) ||
-        (MXM_OK != mxm_config_read_ep_opts(&ompi_mtl_mxm.mxm_ep_opts)))
+    test = (MXM_OK != mxm_config_read_context_opts(&ompi_mtl_mxm.mxm_ctx_opts)) ||
+        (MXM_OK != mxm_config_read_ep_opts(&ompi_mtl_mxm.mxm_ep_opts));
 #endif
+    if (test)
     {
         MXM_ERROR("Failed to parse MXM configuration");
         return OPAL_ERR_BAD_PARAM;

@@ -17,6 +17,7 @@
 #include "vt_pform.h"
 
 #include <stdio.h>
+#include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -112,6 +113,7 @@ void vt_pform_init()
   FILE *cpuinfofp;
   char line[1024];
   int  hostid_retries;
+  bool test;
 
 #if TIMER == TIMER_CYCLE_COUNTER
     int num_measurements=0, loop;
@@ -142,10 +144,11 @@ void vt_pform_init()
 #if TIMER == TIMER_CYCLE_COUNTER
     {
 # if defined(__ia64__)
-      if (!strncmp("itc MHz", line, 7))
+      test = !strncmp("itc MHz", line, 7);
 # else
-      if (!strncmp("cpu MHz", line, 7))
+      test = !strncmp("cpu MHz", line, 7);
 # endif
+      if (test)
       {
 	strtok(line, ":");
       
